@@ -1,0 +1,257 @@
+﻿
+@{
+    Layout = null;
+}
+
+<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+<div class="container  bt-4">
+
+    <br />
+    <br />
+
+
+    <h3>İşlem butonları</h3>
+    <hr />
+
+    <div class="mb-4">
+
+        <button type="button"  id="btnCustomerList" class="btn btn-outline-info" >Müşteri Listesi</button>
+
+        <button type="button" id="btnCustomerAdd" class="btn btn-outline-success">Müşteri Ekle</button>
+
+        <button type="button" id="btnCustomerDelete" class="btn btn-outline-danger">Müşteri Sil</button>
+
+        <button type="button" id="btnCustomerEdit" class="btn btn-outline-warning">Müşteri Güncelle</button>
+
+        <button type="button" id="btnCustomerGet" class="btn btn-outline-secondary">Müşteri Getir</button>
+
+
+    </div>
+
+    <br />
+
+    <h3>Müşteri Ekle</h3>
+    <div >
+       <input type="text" class="form-control" id="txtCustomerName" placeholder="Müşteri Adı" />
+
+       <br />
+
+        <input type="text" class="form-control" id="txtCustomerSurname" placeholder="Müşteri Soyadı" />
+
+        <br />
+
+        <input type="text" class="form-control" id="txtCustomerCity" placeholder="Müşteri Şehri" />
+
+        <br />
+
+
+    </div>
+
+    <br />
+
+    <h3>Müşteri Sil</h3>
+    <div>
+        <input type="text" class="form-control" id="txtCustomerId" placeholder="Silinecek Id" />
+
+    </div>
+
+    <br />
+
+
+    <h3>Müşteri Güncelle</h3>
+    <div>
+        <input type="text" class="form-control" id="txtCustomerId1" placeholder="Müşteri Id" />
+
+        <br />
+        <input type="text" class="form-control" id="txtCustomerName1" placeholder="Müşteri Adı" />
+
+        <br />
+
+        <input type="text" class="form-control" id="txtCustomerSurname1" placeholder="Müşteri Soyadı" />
+
+        <br />
+
+        <input type="text" class="form-control" id="txtCustomerCity1" placeholder="Müşteri Şehri" />
+
+        <br />
+
+
+    </div>
+
+    <br />
+
+    <h3>Müşteri Getir</h3>
+    <div>
+        <input type="text" class="form-control" id="txtCustomerGetId" placeholder="Müşteri Getirilecek Id" />
+
+    </div>
+
+    <br />
+
+    <h3>Müşteri Listesi</h3>
+    <div id="customerList">
+    </div>
+
+
+
+</div>
+
+
+<script>
+
+    $('#btnCustomerList').click(
+
+       
+        ()=>{
+           
+            $.ajax(
+                {
+                    contentType:"application/json",
+                    dataType:"json",
+                    type:"Get",
+                    url: "/Default/ListCustomer/",
+                    success: (a)=>{
+                        var values = jQuery.parseJSON(a);
+                        console.log(values);
+                        var tableHtml = `
+                            <table class=table table-board>
+                                <tr>
+                                    <th> #</th>
+                                    <th> Müşteri Adı</th>
+                                    <th> Müşteri Soyadı</th>
+                                    <th> Şehir</th>
+                                </tr>`
+
+                           $.each(values, (index,value) =>{
+                               tableHtml+=`<tr>
+                                   <th>${value.CustomerId}</th>
+                                   <td>${value.Name}</td>
+                                   <td>${value.Surname}</td>
+                                   <td>${value.City}</td>
+
+                                       </tr>
+                               `   
+                           });
+                           tableHtml+=
+                            ` </table>`;
+
+                        $('#customerList').html(tableHtml)
+                    }
+                });
+    });
+
+    $('#btnCustomerAdd').click(
+        ()=>{
+            console.log("dlfkdlf");
+            let customerValues ={
+                Name: $('#txtCustomerName').val(),
+                Surname: $('#txtCustomerSurname').val(),
+                City: $('#txtCustomerCity').val()
+            };
+        $.ajax({
+            type:"post",
+             url: "/Default/AddCustomer/",
+            data:customerValues,
+            success: (dataa)=>{
+                let result = jQuery.parseJSON(dataa);
+                    swal("Müşteri Eklendi!", "İyi çalışmalar!", "success");
+                // $('#btnCustomerAdd').click();
+
+
+            }
+        });
+
+    });
+
+    $('#btnCustomerDelete').click(
+        ()=>{
+            console.log("ldfkdlf");
+
+            let id = $("#txtCustomerId").val();
+
+            $.ajax({
+                type: "get",
+                url: "/Default/deleteCustomer/" + id,
+                contentType: "application/json",
+                success: (dataa) => {
+                    swal("Müşteri Silindi!", "İyi çalışmalar!", "success");
+                    // $('#btnCustomerAdd').click();
+                }
+            });
+        }     
+    );
+
+    $('#btnCustomerGet').click(
+        () => {
+           
+
+            let id = $("#txtCustomerGetId").val();
+
+            $.ajax({
+                type: "get",
+                dataType:"json",
+                url: "/Default/GetByIdCustomer/",
+                contentType: "application/json",
+                data:{CustomerId:id},
+                success: (dataa) => {
+                    let result = jQuery.parseJSON(dataa)
+                    console.log(result);
+                   // swal("Müşteri Silindi!", "İyi çalışmalar!", "success");
+                    // $('#btnCustomerAdd').click();
+
+
+                    var tableHtml = `
+                                <table class=table table-board>
+                                    <tr>
+                                        <th> #</th>
+                                        <th> Müşteri Adı</th>
+                                        <th> Müşteri Soyadı</th>
+                                        <th> Şehir</th>
+                                    </tr>
+
+                                        <tr>
+                                                <th> ${result.CustomerId}</th>
+                                                <th> ${result.Name}</th>
+                                                <th> ${result.Surname}</th>
+                                                        <th> ${result.City}</th>
+                                        
+                                        </tr>
+
+                                            </table>
+                                    `
+                    $('#customerList').html(tableHtml)
+                }
+            });
+        }
+    );
+
+
+    $('#btnCustomerEdit').click(
+        () => {
+          
+            let customerValues = {
+                CustomerId: $('#txtCustomerId1').val(),
+                Name: $('#txtCustomerName1').val(),
+                Surname: $('#txtCustomerSurname1').val(),
+                City: $('#txtCustomerCity1').val()
+            };
+            $.ajax({
+                type:"post",
+                url: "/Default/EditCustomer/",
+                data: customerValues,
+                success: (dataa) => {
+                    //let result = jQuery.parseJSON(dataa);
+                    swal("Müşteri Güncellendi!", "İyi çalışmalar!", "success");
+                    // $('#btnCustomerAdd').click();
+
+
+                }
+            });
+
+        });
+
+</script>
